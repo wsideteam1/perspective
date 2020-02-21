@@ -205,8 +205,15 @@ if (PSP_WASM_BUILD)
 	####################
 	# EMSCRIPTEN BUILD #
 	####################
-	execute_process(COMMAND which emcc OUTPUT_VARIABLE EMCC)
-	execute_process(COMMAND which em++ OUTPUT_VARIABLE EMPP)
+	# if(NOT WIN32)
+	# 	message(WARNING "NOT WINDOWS")	
+	# 	message(WARNING "${CMAKE_SYSTEM_NAME}")	
+	# 	execute_process(COMMAND which emcc OUTPUT_VARIABLE EMCC)
+	# 	execute_process(COMMAND which em++ OUTPUT_VARIABLE EMPP)
+	# else()
+	execute_process(COMMAND where emcc.bat OUTPUT_VARIABLE EMCC)
+	execute_process(COMMAND where em++.bat OUTPUT_VARIABLE EMPP)
+	# endif()
 	string(STRIP ${EMCC} EMCC)
 	string(STRIP ${EMPP} EMPP)
 	set(CMAKE_C_COMPILER ${EMCC})

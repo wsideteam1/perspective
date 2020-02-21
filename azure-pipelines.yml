@@ -1,96 +1,126 @@
 
 jobs:
-- job: 'WebAssembly'
+# - job: 'WebAssembly_Linux'
+#   pool:
+#     vmImage: 'ubuntu-16.04'
+
+#   steps:
+#     - task: NodeTool@0
+#       inputs:
+#         versionSpec: '12.x'
+
+#     - bash: npm install -g yarn
+#       displayName: "Install Yarn"
+
+#     - bash: yarn
+#       displayName: "Install Deps"
+#       env:
+#         PSP_DOCKER: 1
+
+#     - bash: yarn build_js --ci
+#       displayName: "Build"
+#       env:
+#         PSP_DOCKER: 1
+
+#     - bash: yarn test_js --quiet --ci
+#       displayName: "Test"
+#       env:
+#         PSP_DOCKER: 1
+
+#     - task: PublishTestResults@2
+#       condition: succeededOrFailed()
+#       inputs:
+#         testRunner: JUnit
+#         testResultsFiles: 'junit.xml'
+
+- job: 'WebAssembly_Windows'
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'vs2017-win2016'
 
   steps:
     - task: NodeTool@0
       inputs:
         versionSpec: '12.x'
+
+    - script: |
+        git clone https://github.com/emscripten-core/emsdk.git
+        cd emsdk
+        call emsdk install latest
+        call emsdk activate latest     
+        cd ..
+      displayName: "Install EMSDK"
 
     - bash: npm install -g yarn
       displayName: "Install Yarn"
 
     - bash: yarn
       displayName: "Install Deps"
-      env:
-        PSP_DOCKER: 1
 
-    - bash: yarn build_js --ci
+    - script: |
+        call emsdk\emsdk_env.bat
+        choco install flatc
+        where flatc
+        yarn build_js --ci
       displayName: "Build"
-      env:
-        PSP_DOCKER: 1
 
-    - bash: yarn test_js --quiet --ci
-      displayName: "Test"
-      env:
-        PSP_DOCKER: 1
+# - job: 'Python_Linux'
+#   pool:
+#     vmImage: 'ubuntu-16.04'
 
-    - task: PublishTestResults@2
-      condition: succeededOrFailed()
-      inputs:
-        testRunner: JUnit
-        testResultsFiles: 'junit.xml'
+#   strategy:
+#     matrix:
+#       Python27:
+#         python.version: '2.7'
+#         python_flag: '--python2'
+#         manylinux_flag: ''
+#       Python27ManyLinux2010:
+#         python.version: '2.7'
+#         python_flag: '--python2'
+#         manylinux_flag: '--manylinux2010'
+#       Python37:
+#         python.version: '3.7'
+#         python_flag: ''
+#         manylinux_flag: ''
+#       Python37ManyLinux2010:
+#         python.version: '3.7'
+#         python_flag: ''
+#         manylinux_flag: '--manylinux2010' 
+#       Python37ManyLinux2014:
+#         python.version: '3.7'
+#         python_flag: ''
+#         manylinux_flag: '--manylinux2014'
 
-- job: 'Linux'
-  pool:
-    vmImage: 'ubuntu-16.04'
+#   steps:
+#     - task: UsePythonVersion@0
+#       inputs:
+#         versionSpec: '$(python.version)'
+#         architecture: 'x64'
 
-  strategy:
-    matrix:
-      Python27:
-        python.version: '2.7'
-        python_flag: '--python2'
-        manylinux_flag: ''
-      Python27ManyLinux2010:
-        python.version: '2.7'
-        python_flag: '--python2'
-        manylinux_flag: '--manylinux2010'
-      Python37:
-        python.version: '3.7'
-        python_flag: ''
-        manylinux_flag: ''
-      Python37ManyLinux2010:
-        python.version: '3.7'
-        python_flag: ''
-        manylinux_flag: '--manylinux2010' 
-      Python37ManyLinux2014:
-        python.version: '3.7'
-        python_flag: ''
-        manylinux_flag: '--manylinux2014'
+#     - task: NodeTool@0
+#       inputs:
+#         versionSpec: '12.x'
 
-  steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '$(python.version)'
-        architecture: 'x64'
+#     - bash: npm install -g yarn
+#       displayName: "Install Yarn"
 
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '12.x'
+#     - bash: yarn
+#       displayName: 'Install Deps'
 
-    - bash: npm install -g yarn
-      displayName: "Install Yarn"
+#     - bash: yarn build_python  --ci $(python_flag) $(manylinux_flag)
+#       displayName: 'build'
+#       env:
+#         PSP_DOCKER: 1
 
-    - bash: yarn
-      displayName: 'Install Deps'
+#     - task: PublishTestResults@2
+#       condition: succeededOrFailed()
+#       inputs:
+#         testResultsFiles: 'python/perspective/python_junit.xml'
+#         testRunTitle: 'Publish test results for Python $(python.version) $(manylinux_flag)'
 
-    - bash: yarn build_python  --ci $(python_flag) $(manylinux_flag)
-      displayName: 'build'
-      env:
-        PSP_DOCKER: 1
-
-    - task: PublishTestResults@2
-      condition: succeededOrFailed()
-      inputs:
-        testResultsFiles: 'python/perspective/python_junit.xml'
-        testRunTitle: 'Publish test results for Python $(python.version) $(manylinux_flag)'
-
-    - task: PublishCodeCoverageResults@1
-      inputs: 
-        codeCoverageTool: Cobertura
-        summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
+#     - task: PublishCodeCoverageResults@1
+#       inputs: 
+#         codeCoverageTool: Cobertura
+#         summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
 
 # - job: 'Windows'
 #   pool:
@@ -134,60 +164,60 @@ jobs:
 #       displayName: 'build'
 
 
-- job: 'Mac'
-  pool:
-    vmImage: 'macos-10.14'
+# - job: 'Python_Mac'
+#   pool:
+#     vmImage: 'macos-10.14'
 
-  strategy:
-    matrix:
-      Python27:
-        python.version: '2.7'
-        python_flag: '--python2'
+#   strategy:
+#     matrix:
+#       Python27:
+#         python.version: '2.7'
+#         python_flag: '--python2'
 
-      Python37:
-        python.version: '3.7'
-        python_flag: ''
+#       Python37:
+#         python.version: '3.7'
+#         python_flag: ''
 
-  steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '$(python.version)'
-        architecture: 'x64'
+#   steps:
+#     - task: UsePythonVersion@0
+#       inputs:
+#         versionSpec: '$(python.version)'
+#         architecture: 'x64'
 
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '12.x'
+#     - task: NodeTool@0
+#       inputs:
+#         versionSpec: '12.x'
 
-    - script: |
-        brew install boost
-      displayName: "System deps"
+#     - script: |
+#         brew install boost
+#       displayName: "System deps"
 
-    - script: |
-        which python
-        python --version
-        which python$(python.version)
-      displayName: "Which python"
+#     - script: |
+#         which python
+#         python --version
+#         which python$(python.version)
+#       displayName: "Which python"
 
-    - script: |
-        python -m pip install numpy pyarrow==0.15.1
-      displayName: "Python deps"
+#     - script: |
+#         python -m pip install numpy pyarrow==0.15.1
+#       displayName: "Python deps"
 
-    - script: npm install -g yarn
-      displayName: "Install Yarn"
+#     - script: npm install -g yarn
+#       displayName: "Install Yarn"
 
-    - script: yarn
-      displayName: 'Install Deps'
+#     - script: yarn
+#       displayName: 'Install Deps'
 
-    - script: yarn build_python --ci $(python_flag)
-      displayName: 'build'
+#     - script: yarn build_python --ci $(python_flag)
+#       displayName: 'build'
 
-    - task: PublishTestResults@2
-      condition: succeededOrFailed()
-      inputs:
-        testResultsFiles: 'python/perspective/python_junit.xml'
-        testRunTitle: 'Publish test results for Python $(python.version)'
+#     - task: PublishTestResults@2
+#       condition: succeededOrFailed()
+#       inputs:
+#         testResultsFiles: 'python/perspective/python_junit.xml'
+#         testRunTitle: 'Publish test results for Python $(python.version)'
 
-    - task: PublishCodeCoverageResults@1
-      inputs: 
-        codeCoverageTool: Cobertura
-        summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
+#     - task: PublishCodeCoverageResults@1
+#       inputs: 
+#         codeCoverageTool: Cobertura
+#         summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
