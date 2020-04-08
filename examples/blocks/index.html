@@ -1,0 +1,119 @@
+
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+        <link rel='stylesheet' href="http://localhost:8080/material.css">
+        <script src="http://localhost:8080/perspective-workspace"></script>
+        <script src="http://localhost:8080/perspective-viewer-datagrid"></script>
+        <script src="http://localhost:8080/perspective-viewer-d3fc"></script>
+        <script src="http://localhost:8080/perspective"></script>
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            perspective-viewer {
+                flex: 1;
+            }
+
+            perspective-viewer td {
+                height: 144px;
+                padding: 12px;
+                box-sizing: border-box;
+            }
+
+            perspective-viewer td img {
+                box-shadow: 0px 5px 10px rgba(0,0,0,0.3)
+            }
+
+            perspective-viewer .pd-string {
+                max-width: 300px;
+                white-space: unset;
+            }
+
+            perspective-viewer .clip {
+                max-height: 144px;
+                overflow: hidden;
+            }
+
+            perspective-viewer tr:hover .pd-string .clip {
+                color: #1a7da1;
+                text-decoration: underline;
+            }
+            
+            
+        </style>
+    </head>
+    <body> 
+        <perspective-viewer id="viewer"></perspective-viewer>
+        <script>
+
+            const datasource = async () => {
+                const worker = perspective.worker();
+                const req = await fetch("./data.json");
+                const json = await req.json();
+                return worker.table(json);
+            };
+
+            const CACHE = {}
+            function clone_img_cache() {
+                return Object.keys(CACHE).reduce((obj, key) => {
+                    obj[key] = CACHE[key].slice();
+                    return obj;
+                }, {});
+            }
+
+            window.addEventListener("load", async () => {
+                viewer.load(datasource());
+
+                let datagrid;
+
+                viewer.addEventListener('click', async event => {
+                    if (event.target.tagName === "TD" || event.target.parentElement.tagName === "TD") {
+                        const meta = datagrid.get_meta(event.target) || datagrid.get_meta(event.target.parentElement) 
+                        console.log(meta);
+                        const [{path}] = await viewer.view.to_json({start_row: meta.ridx, end_row: meta.ridx + 1})
+                        window.location.href = `${path.replace("/thumbnail.png", "")}/index.html`;
+                    }
+                });
+                
+
+                viewer.addEventListener('perspective-datagrid-after-update', event => {
+                    datagrid = event.detail;
+                    const cache = clone_img_cache();
+                    for (const td of event.detail.get_tds()) {
+                        const metadata = event.detail.get_meta(td);
+                        if (metadata.column.indexOf("path") > -1) {
+                            if (cache[metadata.value] && cache[metadata.value].length > 0) {
+                                const name = metadata.value;
+                                td.textContent = "";
+                                td.appendChild(cache[name].pop());
+                            } else {
+                                const name = metadata.value;
+                                const span = document.createElement("span")
+                                const img = document.createElement("img");
+                                img.setAttribute("src", metadata.value);
+                
+                                td.textContent = "";
+                                span.appendChild(img)
+                                td.appendChild(span);
+                                CACHE[name] = CACHE[name] || [];
+                                CACHE[name].push(img);
+                            }
+                        } else {
+                            td.innerHTML = "<div class='clip'>" + metadata.value + "</div>";
+                        }
+                    }
+                })
+            });
+        </script>
+    </body>
+</html>

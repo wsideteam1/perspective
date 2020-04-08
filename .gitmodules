@@ -1,0 +1,27 @@
+[submodule "examples/blocks/custom-datagrid"]
+	path = examples/blocks/custom-datagrid
+	url = https://gist.github.com/c42f3189699bd29cf20bbe7dce767b07.git
+[submodule "examples/blocks/nyc-citibike"]
+	path = examples/blocks/nyc-citibike
+	url = https://gist.github.com/bc8d7e6f72e09c9dbd7424b4332cacad.git
+[submodule "examples/blocks/iex-cloud"]
+	path = examples/blocks/iex-cloud
+	url = https://gist.github.com/eb151fdd9f98bde987538cbc20e003f6.git
+[submodule "examples/blocks/olympics-v2"]
+	path = examples/blocks/olympics-v2
+	url = https://gist.github.com/d4dbf43e52da78e48ade1af4fa9093f4.git
+[submodule "examples/blocks/superstore"]
+	path = examples/blocks/superstore
+	url = https://gist.github.com/803de90736a3641ad91c5c7a1b49d0a7.git
+[submodule "examples/blocks/editable"]
+	path = examples/blocks/editable
+	url = https://gist.github.com/45b868833c9f456bd39a51e606412c5d.git
+[submodule "examples/blocks/streaming"]
+	path = examples/blocks/streaming
+	url = https://gist.github.com/9bec2f8041471bafc2c56db2272a9381.git
+[submodule "examples/blocks/csv"]
+	path = examples/blocks/csv
+	url = https://gist.github.com/02d8fd10aef21b19d6165cf92e43e668.git
+[submodule "examples/blocks/olympics"]
+	path = examples/blocks/olympics
+	url = https://gist.github.com/efd4a857aca9a52ab6cddbb6e1f701c9.git
