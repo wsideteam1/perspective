@@ -418,9 +418,7 @@ export class PerspectiveWorkspace extends DiscreteSplitPanel {
 
     onPerspectiveSelect = event => {
         const config = event.target.save();
-        // perspective-select is already handled for hypergrid
-
-        if (event.type === "perspective-click" && config.plugin === "hypergrid") {
+        if (event.type === "perspective-click" && config.plugin === "datagrid") {
             return;
         }
         const candidates = new Set([...(config["row-pivots"] || []), ...(config["column-pivots"] || []), ...(config.filters || []).map(x => x[0])]);

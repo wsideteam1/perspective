@@ -4,7 +4,7 @@ const common = require("@finos/perspective/src/config/common.config.js");
 module.exports = common({}, config =>
     Object.assign(config, {
         entry: "./dist/esm/index.js",
-        externals: [/^[a-z0-9@]/],
+        externals: [/^(?!(\.|regular\-table))/],
         output: {
             filename: "perspective-viewer-datagrid.js",
             library: "perspective-viewer-datagrid",
