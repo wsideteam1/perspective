@@ -10,13 +10,21 @@
 const {execute, docker, clean, resolve, getarg, bash, python_image} = require("./script_utils.js");
 const fs = require("fs-extra");
 
-const IS_DOCKER = process.env.PSP_DOCKER;
 const IS_PY2 = getarg("--python2");
-const PYTHON = IS_PY2 ? "python2" : getarg("--python38") ? "python3.8" : "python3.7";
+let PYTHON = IS_PY2 ? "python2" : getarg("--python38") ? "python3.8" : "python3.7";
+
+const IS_DOCKER = process.env.PSP_DOCKER;
 const IMAGE = IS_DOCKER ? python_image(getarg("--manylinux2010") ? "manylinux2010" : getarg("--manylinux2014") ? "manylinux2014" : "", PYTHON) : "";
 
 const IS_CI = getarg("--ci");
 const IS_INSTALL = getarg("--install");
+
+// Check that the `PYTHON` command is valid, else default to `python`.
+try {
+    execute`${PYTHON} --version`;
+} catch (e) {
+    PYTHON = "python";
+}
 
 try {
     const dist = resolve`${__dirname}/../python/perspective/dist`;
