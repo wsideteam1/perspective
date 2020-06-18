@@ -194,6 +194,12 @@ jobs:
         BOOST_ROOT: "C:/hostedtoolcache/windows/Boost/1.69.0/"
         BOOST_INCLUDEDIR: "C:/hostedtoolcache/windows/Boost/1.69.0/include"
         BOOST_LIBRARYDIR: "C:/hostedtoolcache/windows/Boost/1.69.0/libs"
+    
+    # Save the build to Azure storage
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(System.DefaultWorkingDirectory)/python/perspective/build/'
+        artifactName: '$(artifact_name)'
 
 - job: 'Mac'
   pool:
