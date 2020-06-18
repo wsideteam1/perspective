@@ -195,7 +195,6 @@ jobs:
         BOOST_INCLUDEDIR: "C:/hostedtoolcache/windows/Boost/1.69.0/include"
         BOOST_LIBRARYDIR: "C:/hostedtoolcache/windows/Boost/1.69.0/libs"
 
-
 - job: 'Mac'
   pool:
     vmImage: 'macos-10.14'
